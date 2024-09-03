@@ -1,0 +1,17 @@
+[package]
+name = "rust-e2ee"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/sdk/bin/main.rs"
+name = "cli"
+
+[[bin]]
+path = "src/cli/bin/main.rs"
+name = "sdk"
+
+[dependencies]
