@@ -12,7 +12,7 @@ pub fn encrypt(data: &[u8], key: &RsaPublicKey) -> Result<Vec<u8>, String> {
 
 #[cfg(test)]
 mod test {
-    use crate::crypto::generate;
+    use crate::key::generate;
 
     use super::*;
 

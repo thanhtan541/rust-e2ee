@@ -1,23 +1,17 @@
-[package]
-name = "rust-e2ee"
-version = "0.1.0"
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+rust-version = "1.80"
 edition = "2021"
 
-[lib]
-path = "src/lib.rs"
+[workspace.dependencies]
+# local crates
+crypto = { path = "./crates/crypto", version = "0.0.0" }
 
-[[bin]]
-path = "src/sdk/bin/main.rs"
-name = "sdk"
-
-[[bin]]
-path = "src/cli/bin/main.rs"
-name = "cli"
-
-[dependencies]
-# Data formatter
+# non-local crates
 base64 = "0.22.1"
-#Crypto
 ring = "0.17.8"
 rsa = "0.9.6"
 sha2 = "0.10"

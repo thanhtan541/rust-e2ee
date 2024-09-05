@@ -10,7 +10,7 @@ pub fn decrypt(enc_data: &[u8], key: &RsaPrivateKey) -> Result<Vec<u8>, String> 
 
 #[cfg(test)]
 mod test {
-    use crate::crypto::{encrypt, generate};
+    use crate::{encrypt::encrypt, key::generate};
 
     use super::*;
 

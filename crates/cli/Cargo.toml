@@ -1,0 +1,11 @@
+[package]
+name = "cli"
+version = "0.1.0"
+rust-version.workspace = true
+edition.workspace = true
+
+[dependencies]
+crypto.workspace = true
+base64.workspace = true
+clap.workspace = true
+rsa.workspace = true

@@ -1,10 +1,10 @@
 use base64::{engine::general_purpose, Engine};
 use clap::{Parser, Subcommand};
+use crypto::{decrypt::decrypt, encrypt::encrypt, key::generate};
 use rsa::{
     pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey, LineEnding},
     RsaPrivateKey, RsaPublicKey,
 };
-use rust_e2ee::crypto::{decrypt, encrypt, generate};
 use std::{
     fs::{self, File},
     io::Write,
@@ -52,6 +52,9 @@ fn main() {
     match cli.command {
         Commands::Generate { bits, filename } => {
             let keypair = generate().expect("Failed to generate keypair");
+
+            //Todo: use thread to speed up process
+            println!("Your private key has been saved in {}", filename);
             let priv_key_pem = keypair.secret.to_pkcs8_pem(LineEnding::LF).unwrap();
             let mut private_key_file =
                 File::create(filename.clone()).expect("Failed to create public key file");
@@ -66,7 +69,6 @@ fn main() {
                 .write_all(pub_key_pem.as_bytes())
                 .expect("Failed to write file content");
 
-            println!("Your private key has been saved in {}.", filename);
             println!("Your public key has been saved in {}.pub", filename);
         }
         Commands::Encrypt {
