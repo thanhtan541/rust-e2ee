@@ -1,12 +1,9 @@
 use rand::thread_rng;
-use rsa::Pkcs1v15Encrypt;
+use rsa::{Pkcs1v15Encrypt, RsaPublicKey};
 
-use super::KeyPair;
-
-pub fn encrypt(data: &[u8], keypair: &KeyPair) -> Result<Vec<u8>, String> {
+pub fn encrypt(data: &[u8], key: &RsaPublicKey) -> Result<Vec<u8>, String> {
     let mut rng = thread_rng();
-    let enc_data = keypair
-        .public
+    let enc_data = key
         .encrypt(&mut rng, Pkcs1v15Encrypt, &data[..])
         .expect("failed to encrypt");
 
@@ -26,7 +23,7 @@ mod test {
         assert!(keypair.secret.validate().is_ok());
 
         let data = b"hello world";
-        let enc_data = encrypt(data, &keypair).expect("Fail to encrypt data");
+        let enc_data = encrypt(data, &keypair.public).expect("Fail to encrypt data");
 
         assert_ne!(&data[..], &enc_data[..]);
     }

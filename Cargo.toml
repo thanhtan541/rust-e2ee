@@ -15,8 +15,11 @@ path = "src/cli/bin/main.rs"
 name = "cli"
 
 [dependencies]
+# Data formatter
+base64 = "0.22.1"
 #Crypto
 ring = "0.17.8"
 rsa = "0.9.6"
 sha2 = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
+clap = { version = "4.5.17", features = ["derive"] }

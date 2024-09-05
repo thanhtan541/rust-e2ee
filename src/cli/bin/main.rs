@@ -1,65 +1,81 @@
-use rsa::pkcs8::{EncodePrivateKey, LineEnding};
-use rust_e2ee::crypto::{generate, KeyPair};
+use std::fs;
+
+use clap::{Parser, Subcommand};
+
+use rsa::{
+    pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey, LineEnding},
+    RsaPrivateKey, RsaPublicKey,
+};
+use rust_e2ee::crypto::{decrypt, encrypt, generate};
+
+#[derive(Parser)]
+#[command(
+    author = "thanhtan541",
+    version = "0.1.0",
+    about = "RSA encryption/decryption CLI"
+)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    #[command(about = "Generate an RSA key pair")]
+    Generate {
+        #[arg(short, long, default_value = "2048")]
+        bits: usize,
+    },
+    #[command(about = "Encrypt a message")]
+    Encrypt {
+        #[arg(short, long, help = "Path to public key")]
+        public_key: String,
+        #[arg(short, long)]
+        message: String,
+    },
+    #[command(about = "Decrypt a message")]
+    Decrypt {
+        #[arg(short, long, help = "Path to private key")]
+        private_key: String,
+        #[arg(short, long)]
+        ciphertext: String,
+    },
+}
 
 fn main() {
-    println!("Welcome to ee2e CLI");
+    let cli = Cli::parse();
 
-    println!("Please choose your commands.");
-    let helper_messages = r#"
-        1. Genereate RSA keypair
-        2. Encrypt a message with given key
-        3. Decrypt a message with given key
-    "#;
-    println!("{}", helper_messages);
-    let mut input = String::new();
+    match cli.command {
+        Commands::Generate { bits } => {
+            let keypair = generate().expect("Failed to generate keypair");
 
-    std::io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-
-    println!("You want: {input}");
-    let command: Command = input
-        .trim()
-        .try_into()
-        .expect("Please choose valid command!");
-    match command {
-        Command::GenerateKeyPair => {
-            println!("Generated Keys:");
-            let keypair = generate().expect("Fail to generated keypair");
             println!(
-                "Private key pem: {:?}",
-                keypair
-                    .secret
-                    .to_pkcs8_pem(LineEnding::LF)
-                    .unwrap()
-                    .to_string()
+                "Private Key (PEM):\n{:?}",
+                keypair.secret.to_pkcs8_pem(LineEnding::LF).unwrap()
             );
-            println!("Public key pem");
+            println!(
+                "Public Key (PEM):\n{:?}",
+                keypair.public.to_public_key_pem(LineEnding::LF).unwrap()
+            );
         }
-        Command::Encrypt => {
-            println!("Encrypted message")
+        Commands::Encrypt {
+            public_key,
+            message,
+        } => {
+            let key_pem = fs::read_to_string(public_key).expect("Failed to read file");
+            let key = RsaPublicKey::from_public_key_pem(key_pem.as_str()).unwrap();
+            let ciphertext = encrypt(message.as_bytes(), &key).expect("Failed to encrypt message");
+            println!("Ciphertext: {:?}", ciphertext);
         }
-        Command::Decrypt => {
-            println!("Decrypted message")
-        }
-    }
-}
-
-enum Command {
-    GenerateKeyPair,
-    Encrypt,
-    Decrypt,
-}
-
-impl TryFrom<&str> for Command {
-    type Error = String;
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "1" => Ok(Command::GenerateKeyPair),
-            "2" => Ok(Command::Encrypt),
-            "3" => Ok(Command::Decrypt),
-            _ => Err("Invalid command".into()),
+        Commands::Decrypt {
+            private_key,
+            ciphertext,
+        } => {
+            let key_pem = fs::read_to_string(private_key).expect("Failed to read file");
+            let key = RsaPrivateKey::from_pkcs8_pem(key_pem.as_str()).unwrap();
+            let plaintext =
+                decrypt(ciphertext.as_bytes(), &key).expect("Failed to encrypt message");
+            println!("Plaintext: {}", String::from_utf8(plaintext).unwrap());
         }
     }
 }
