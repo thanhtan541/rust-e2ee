@@ -1,6 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
+pub fn add(left: u32, right: u32) -> u32 {
     left + right
 }
+
+uniffi::include_scaffolding!("ee2e_sdk");
 
 #[cfg(test)]
 mod tests {

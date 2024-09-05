@@ -4,4 +4,15 @@ version = "0.1.0"
 rust-version.workspace = true
 edition.workspace = true
 
+[lib]
+crate-type = ["cdylib"]
+name = "e2ee_sdk"
+
 [dependencies]
+uniffi = { workspace = true }
+
+[build-dependencies]
+uniffi = { workspace = true, features = [ "build" ] }
+
+[dev-dependencies]
+uniffi = { workspace = true, features = ["bindgen-tests"] }
