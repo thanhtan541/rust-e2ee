@@ -9,6 +9,7 @@ crate-type = ["cdylib"]
 name = "e2ee_sdk"
 
 [dependencies]
+crypto = { workspace = true }
 uniffi = { workspace = true }
 
 [build-dependencies]
