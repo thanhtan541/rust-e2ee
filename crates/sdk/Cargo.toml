@@ -5,11 +5,13 @@ rust-version.workspace = true
 edition.workspace = true
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "staticlib", "lib"]
 name = "e2ee_sdk"
 
 [dependencies]
 crypto = { workspace = true }
+rsa = { workspace = true }
+base64 = { workspace = true }
 uniffi = { workspace = true }
 
 [build-dependencies]

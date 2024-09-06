@@ -12,7 +12,6 @@ crypto = { path = "./crates/crypto", version = "0.0.0" }
 
 # non-local crates
 base64 = "0.22.1"
-ring = "0.17.8"
 rsa = "0.9.6"
 sha2 = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
