@@ -23,10 +23,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    #[command(about = "Generate an RSA key pair")]
+    #[command(about = "Generate an RSA key pair in pem format")]
     Generate {
-        #[arg(short, long, default_value = "2048")]
-        bits: usize,
         #[arg(short, long, help = "Enter file in which to save the key")]
         filename: String,
     },
@@ -50,18 +48,20 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Generate { bits, filename } => {
+        Commands::Generate { filename } => {
             let keypair = generate().expect("Failed to generate keypair");
 
             //Todo: use thread to speed up process
-            println!("Your private key has been saved in {}", filename);
+            println!("Generating your private key");
             let priv_key_pem = keypair.secret.to_pkcs8_pem(LineEnding::LF).unwrap();
             let mut private_key_file =
                 File::create(filename.clone()).expect("Failed to create public key file");
             private_key_file
                 .write_all(priv_key_pem.as_bytes())
                 .expect("Failed to write file content");
+            println!("Your private key has been saved in {}", filename);
 
+            println!("Generating your public key");
             let pub_key_pem = keypair.public.to_public_key_pem(LineEnding::LF).unwrap();
             let mut public_key_file = File::create(format!("{}.pub", filename))
                 .expect("Failed to create public key file");
