@@ -7,7 +7,6 @@ edition.workspace = true
 description = "Set of operation to handle: Key-generation, encryption and decryption"
 
 [dependencies]
-ring.workspace = true
 rsa.workspace = true
 sha2.workspace = true
 rand.workspace = true
