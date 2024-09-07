@@ -33,8 +33,8 @@ fat_simulator_lib_dir="target/ios-simulator-fat/release"
 generate_ffi() {
   echo "Generating framework module mapping and FFI bindings"
   cargo run -p uniffi-bindgen generate --library target/aarch64-apple-ios/release/lib$1.dylib --language swift --out-dir target/uniffi-xcframework-staging
-  mkdir -p ./apple/Sources/UniFFI/
-  mv target/uniffi-xcframework-staging/*.swift ./apple/Sources/UniFFI/
+  mkdir -p ./target/ios/Sources/UniFFI/
+  mv target/uniffi-xcframework-staging/*.swift ./target/ios/Sources/UniFFI/
   mv target/uniffi-xcframework-staging/$1FFI.modulemap target/uniffi-xcframework-staging/module.modulemap  # Convention requires this have a specific name
 }
 
@@ -47,7 +47,7 @@ create_fat_simulator_lib() {
 build_xcframework() {
   # Builds an XCFramework
   echo "Generating XCFramework"
-  rm -rf target/ios  # Delete the output folder so we can regenerate it
+  rm -rf target/ios/lib$1-rs.xcframework
   xcodebuild -create-xcframework \
     -library target/aarch64-apple-ios/release/lib$1.a -headers target/uniffi-xcframework-staging \
     -library target/ios-simulator-fat/release/lib$1.a -headers target/uniffi-xcframework-staging \
@@ -57,7 +57,7 @@ build_xcframework() {
     echo "Building xcframework archive"
     zip -r target/ios/lib$1-rs.xcframework.zip target/ios/lib$1-rs.xcframework
     checksum=$(swift package compute-checksum target/ios/lib$1-rs.xcframework.zip)
-    version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="foobar") .version')
+    version=$(cargo metadata --format-version 1 | jq -r '.packages[] | select(.name=="sdk_e2ee") .version')
     sed -i "" -E "s/(let releaseTag = \")[^\"]+(\")/\1$version\2/g" ../Package.swift
     sed -i "" -E "s/(let releaseChecksum = \")[^\"]+(\")/\1$checksum\2/g" ../Package.swift
   fi

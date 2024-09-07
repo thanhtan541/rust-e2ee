@@ -17,8 +17,3 @@ sha2 = "0.10"
 rand = { version = "0.8", features = ["std_rng"] }
 clap = { version = "4.5.17", features = ["derive"] }
 uniffi = { version = "0.28.1" }
-# [workspace.build-dependencies]
-# uniffi = { version = "0.28.1", features = [ "build" ] }
-#
-# [workspace.dev-dependencies]
-# uniffi = { version = "0.28.1", features = ["bindgen-tests"] }

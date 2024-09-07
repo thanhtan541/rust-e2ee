@@ -25,7 +25,9 @@ enum Commands {
         #[arg(short, long, help = "Enter file in which to save the key")]
         filename: String,
     },
-    #[command(about = "Encrypt a given plaintext message using the public key and encoded in base64")]
+    #[command(
+        about = "Encrypt a given plaintext message using the public key and encoded in base64"
+    )]
     Encrypt {
         #[arg(short, long, help = "Path to public key")]
         public_key: String,
