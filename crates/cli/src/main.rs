@@ -1,14 +1,11 @@
 use base64::{engine::general_purpose, Engine};
 use clap::{Parser, Subcommand};
-use crypto::{decrypt::decrypt, encrypt::encrypt, key::generate};
-use rsa::{
-    pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePrivateKey, EncodePublicKey, LineEnding},
-    RsaPrivateKey, RsaPublicKey,
+use crypto::{
+    decrypt::decrypt,
+    encrypt::encrypt,
+    key::{self, generate},
 };
-use std::{
-    fs::{self, File},
-    io::Write,
-};
+use std::{fs::File, io::Write};
 
 #[derive(Parser)]
 #[command(
@@ -52,31 +49,20 @@ fn main() {
             let keypair = generate().expect("Failed to generate keypair");
 
             //Todo: use thread to speed up process
-            println!("Generating your private key");
-            let priv_key_pem = keypair.secret.to_pkcs8_pem(LineEnding::LF).unwrap();
-            let mut private_key_file =
-                File::create(filename.clone()).expect("Failed to create public key file");
-            private_key_file
-                .write_all(priv_key_pem.as_bytes())
-                .expect("Failed to write file content");
+            let priv_key_pem = keypair.to_privkey_pem();
+            export_file(filename.as_str(), &priv_key_pem);
             println!("Your private key has been saved in {}", filename);
 
-            println!("Generating your public key");
-            let pub_key_pem = keypair.public.to_public_key_pem(LineEnding::LF).unwrap();
-            let mut public_key_file = File::create(format!("{}.pub", filename))
-                .expect("Failed to create public key file");
-            public_key_file
-                .write_all(pub_key_pem.as_bytes())
-                .expect("Failed to write file content");
-
-            println!("Your public key has been saved in {}.pub", filename);
+            let pub_key_pem = keypair.to_pubkey_pem();
+            let pub_filename = format!("{}.pub", filename);
+            export_file(&pub_filename, &pub_key_pem);
+            println!("Your public key has been saved in {pub_filename}");
         }
         Commands::Encrypt {
             public_key,
             message,
         } => {
-            let key_pem = fs::read_to_string(public_key).expect("Failed to read file");
-            let key = RsaPublicKey::from_public_key_pem(key_pem.as_str()).unwrap();
+            let key = key::get_pubkey_from_pem(public_key).expect("Failed to get Public Key");
             let ciphertext = encrypt(message.as_bytes(), &key).expect("Failed to encrypt message");
             let encoded_cipher = general_purpose::STANDARD.encode(&ciphertext);
             println!("Ciphertext: \n {:?}", encoded_cipher);
@@ -85,8 +71,7 @@ fn main() {
             private_key,
             ciphertext,
         } => {
-            let key_pem = fs::read_to_string(private_key).expect("Failed to read file");
-            let key = RsaPrivateKey::from_pkcs8_pem(key_pem.as_str()).unwrap();
+            let key = key::get_privkey_from_pem(private_key).expect("Failed to get Private Key");
             let decoded_cipher = general_purpose::STANDARD
                 .decode(ciphertext.as_str())
                 .expect("Failed to decode base64 text");
@@ -95,4 +80,11 @@ fn main() {
             println!("Plaintext: \n {}", String::from_utf8(plaintext).unwrap());
         }
     }
+}
+
+fn export_file(filename: &str, content: &str) {
+    let mut exported_file = File::create(filename).expect("Failed to create file");
+    exported_file
+        .write_all(content.as_bytes())
+        .expect("Failed to write file content");
 }
