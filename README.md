@@ -11,8 +11,8 @@
 
 2. SDK Development
     - [x] Provide bindings for mobile platforms
-    - [x] SDK integration guides for mobile
-    - [ ] Provide bindings for desktio platforms
+    - [ ] SDK integration guides for mobile
+    - [ ] Provide bindings for desktop platforms
     - [ ] SDK integration guides for desktop
     - [ ] Write tests to verify the SDK functionality
 3. Deployment
@@ -86,34 +86,25 @@ Before opening up the Swift package in Xcode, you need to build the Rust core.
 
 ```shell
 cd rust/
-./build-ios.sh
+./crate/sdk/build-ios.sh
 ```
-
 This generates an XCFramework and generates Swift bindings to the Rust core.
-Check the script if you're interested in the gritty details.
-
-**You need to do this every time you make Rust changes that you want reflected in the Swift Package!**
-
-#### Stuff to look at
-
-* `Package.swift` documents the UniFFI setup (which is... special thanks to SPM quirks).
-* `SafeCalculator` and `SafeMultiply` in `Sources/Foobar` contain the Swift-y calculator wrapper class and multiplication operator.
 
 ### Android
 
 You need to install [`cargo-ndk`](https://github.com/bbqsrc/cargo-ndk).
 
 ```shell
-cargo install cargo-ndk
+./crate/sdk/build-android.sh
 ```
+This generates an shared object file for each target architects
+
+### Window
+
+Not supported, yet!
 #### Stuff to look at
 
-* The interesting stuff lives under the `SafeCalculator` and `SafeMultiply` classes.
-* Also check out the tests for an example of usage.
-* You can also check out the Android tests.
-* The gradle files are mostly boilerplate, but there are a few things in there needed for building the Rust library. That took a while to figure out, and I currently believe this is the easiest approach.
-
-## References that are used to build this repo
+## References that are used to develop this repo
 
 * [clap](https://github.com/clap-rs/clap) - a crate that gives simple declarative codes to build `CLI`
 * [cargo-ndk](https://github.com/bbqsrc/cargo-ndk) - cargo subcommand to build Android's Artifacts
