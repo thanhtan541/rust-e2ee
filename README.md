@@ -16,9 +16,9 @@
     - [ ] SDK integration guides for desktop
     - [ ] Write tests to verify the SDK functionality
 3. Deployment
+    - [ ] Mobile: Build scripts for Android and iOS projects.
+    - [ ] Mobile: Configuration for integrating the SDK with Android and iOS projects.
     - [ ] Desktop: Instructions for building and deploying the SDK on a desktop platform.
-    - [x] Mobile: Configuration for integrating the SDK with Android and iOS projects.
-
 ## Quick start
 
 ### Rust
@@ -85,8 +85,9 @@ Plaintext:
 Before opening up the Swift package in Xcode, you need to build the Rust core.
 
 ```shell
-cd rust/
 ./crate/sdk/build-ios.sh
+
+output target: ./target/android
 ```
 This generates an XCFramework and generates Swift bindings to the Rust core.
 
@@ -96,6 +97,8 @@ You need to install [`cargo-ndk`](https://github.com/bbqsrc/cargo-ndk).
 
 ```shell
 ./crate/sdk/build-android.sh
+
+output target: ./target/android
 ```
 This generates an shared object file for each target architects
 
