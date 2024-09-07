@@ -20,19 +20,19 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    #[command(about = "Generate an RSA key pair in pem format")]
+    #[command(about = "Generate RSA key pair in pem format")]
     Generate {
         #[arg(short, long, help = "Enter file in which to save the key")]
         filename: String,
     },
-    #[command(about = "Encrypt a message")]
+    #[command(about = "Encrypt a given plaintext message using the public key and encoded in base64")]
     Encrypt {
         #[arg(short, long, help = "Path to public key")]
         public_key: String,
         #[arg(short, long)]
         message: String,
     },
-    #[command(about = "Decrypt a message")]
+    #[command(about = "Decrypt the encrypted message in base64 using the private key")]
     Decrypt {
         #[arg(short, long, help = "Path to private key")]
         private_key: String,
